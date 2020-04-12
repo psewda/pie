@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/psewda/pie/app"
@@ -24,8 +25,12 @@ func main() {
 	fmt.Printf("*********************************************************************\n")
 	fmt.Printf("\n")
 
+	port, ok := parsePort(os.Getenv("PIE_PORT"))
+	if !ok {
+		port = app.GetRandPort()
+	}
 	app := app.NewApp()
-	app.Run(8800)
+	app.Run(port)
 
 	done := make(chan bool)
 	q = handleOsSignal(app, done)
@@ -44,4 +49,15 @@ func handleOsSignal(app app.App, done chan bool) chan os.Signal {
 		close(done)
 	}()
 	return quit
+}
+
+func parsePort(port string) (uint16, bool) {
+	if len(port) > 0 {
+		if v, err := strconv.Atoi(port); err == nil {
+			if v >= 1024 && v <= 65535 {
+				return uint16(v), true
+			}
+		}
+	}
+	return 0, false
 }
