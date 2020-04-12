@@ -21,13 +21,13 @@ func TestMain(t *testing.T) {
 		defer func() { q <- os.Interrupt }()
 		time.Sleep(time.Second)
 
-		url := fmt.Sprintf("http://%s:%d", "127.0.0.1", port)
+		url := fmt.Sprintf("http://%s:%d/api/v1/pie-store/version", "127.0.0.1", port)
 		cmd := exec.Command("/usr/bin/curl", "-i", url)
 		out, err := cmd.Output()
 
 		assert.Nil(t, err)
 		assert.Contains(t, string(out), "200 OK")
-		assert.Contains(t, string(out), "Hello Pie !!")
+		assert.Contains(t, string(out), "version")
 	}()
 	main()
 }

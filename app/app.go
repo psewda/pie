@@ -9,8 +9,6 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 type App interface {
@@ -50,18 +48,11 @@ func (app *httpApp) Dispose() {
 }
 
 func NewApp() App {
-	hello := func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Hello Pie !!")
-	}
-
-	r := mux.NewRouter()
-	r.HandleFunc("/", hello).Methods("GET")
-
+	r := NewRouter()
 	return &httpApp{
 		running: false,
 		server: &http.Server{
-			Handler: r,
+			Handler: r.Handler,
 		},
 	}
 }
