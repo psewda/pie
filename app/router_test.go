@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVersion(t *testing.T) {
+func TestEndpointVersion(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/pie-store/version", nil)
 
 	dr := DefaultRouter{}
