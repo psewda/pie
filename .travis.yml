@@ -1,0 +1,6 @@
+language: go
+go: 
+  - "1.14.x"
+
+script:
+  - go build -ldflags="-s -w" -o ./bin/pie ./cmd/pie/main.go
