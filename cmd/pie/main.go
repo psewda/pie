@@ -16,6 +16,12 @@ func main() {
 	fmt.Printf("*********************************************************************\n")
 	fmt.Printf("------------------------- PIE SESSION STORE -------------------------\n")
 	fmt.Printf("*********************************************************************\n")
+	fmt.Printf("Version:     %s\n", app.Version)
+	fmt.Printf("Golang:      %s\n", app.Golang)
+	fmt.Printf("Git-Commit:  %s\n", app.GitCommit)
+	fmt.Printf("Built:       %s\n", app.Built)
+	fmt.Printf("OS/Arch:     %s\n", app.OsArch)
+	fmt.Printf("*********************************************************************\n")
 	fmt.Printf("\n")
 
 	app := app.NewApp()
