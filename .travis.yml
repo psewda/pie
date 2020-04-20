@@ -5,3 +5,12 @@ go:
 script:
   - make build
   - make test
+  - make package
+
+deploy:
+  provider: s3
+  bucket: pie-session-store
+  region: ap-south-1
+  upload-dir: public
+  local_dir: ./bin/package
+  skip_cleanup: true

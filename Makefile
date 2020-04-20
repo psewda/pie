@@ -17,6 +17,9 @@ build-windows:
 
 build: build-linux build-windows
 
+package:
+	$(BASE_DIR)/ci/package.sh
+
 test:
 	go test -v ./...
 
