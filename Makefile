@@ -21,7 +21,7 @@ package:
 	$(BASE_DIR)/ci/package.sh
 
 test:
-	go test -v ./...
+	go clean -testcache && go test -v ./...
 
 run:
 	go build -o $(OUTPUT)/$(APP) $(MAIN)
