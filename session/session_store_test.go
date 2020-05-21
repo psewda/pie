@@ -36,7 +36,7 @@ func TestGetSessionFromStore(t *testing.T) {
 	// test invalid inputs
 	data := []string{strutil.Empty, "non-found"}
 	for _, item := range data {
-		s, ok := store.Get(uid(item))
+		s, ok := store.Get(item)
 		assert.False(t, ok)
 		assert.Zero(t, s)
 	}
@@ -49,7 +49,7 @@ func TestRemoveSessionFromStore(t *testing.T) {
 	store.Add(s)
 
 	data := []struct {
-		id       uid
+		id       string
 		expected bool
 	}{
 		{
@@ -57,7 +57,7 @@ func TestRemoveSessionFromStore(t *testing.T) {
 			expected: true,
 		},
 		{
-			id:       uid(strutil.Empty),
+			id:       strutil.Empty,
 			expected: false,
 		},
 		{

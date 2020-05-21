@@ -8,10 +8,8 @@ import (
 	"github.com/rs/xid"
 )
 
-type uid string
-
 type SessionInfo struct {
-	Id      uid
+	Id      string
 	Client  string
 	Timeout time.Duration
 }
@@ -58,7 +56,7 @@ func NewSession(client string, timeout time.Duration) (Session, error) {
 
 	s := Session{
 		info: SessionInfo{
-			Id:      uid(xid.New().String()),
+			Id:      xid.New().String(),
 			Client:  client,
 			Timeout: timeout,
 		},

@@ -8,8 +8,8 @@ import (
 
 type SessionStore interface {
 	Add(s Session) error
-	Get(id uid) (Session, bool)
-	Remove(id uid) bool
+	Get(id string) (Session, bool)
+	Remove(id string) bool
 	Dispose()
 }
 
@@ -19,7 +19,7 @@ type internalSession struct {
 }
 
 type inMemoryStore struct {
-	sessions map[uid]internalSession
+	sessions map[string]internalSession
 	quit     chan struct{}
 }
 
@@ -38,7 +38,7 @@ func (store *inMemoryStore) Add(s Session) error {
 	return nil
 }
 
-func (store *inMemoryStore) Get(id uid) (Session, bool) {
+func (store *inMemoryStore) Get(id string) (Session, bool) {
 	if len(id) == 0 {
 		return Session{}, false
 	}
@@ -51,7 +51,7 @@ func (store *inMemoryStore) Get(id uid) (Session, bool) {
 	return is.session, ok
 }
 
-func (store *inMemoryStore) Remove(id uid) bool {
+func (store *inMemoryStore) Remove(id string) bool {
 	if len(id) > 0 {
 		if _, ok := store.sessions[id]; ok {
 			delete(store.sessions, id)
@@ -68,7 +68,7 @@ func (store *inMemoryStore) Dispose() {
 
 func NewSessionStore() SessionStore {
 	store := &inMemoryStore{
-		sessions: make(map[uid]internalSession),
+		sessions: make(map[string]internalSession),
 		quit:     make(chan struct{}),
 	}
 	go runKiller(store)
