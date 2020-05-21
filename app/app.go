@@ -9,6 +9,8 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/psewda/pie/session"
 )
 
 type App interface {
@@ -48,7 +50,8 @@ func (app *httpApp) Dispose() {
 }
 
 func NewApp() App {
-	r := NewRouter()
+	store := session.NewSessionStore()
+	r := NewRouter(store)
 	return &httpApp{
 		running: false,
 		server: &http.Server{
