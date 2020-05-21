@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -70,6 +71,49 @@ func TestEndpointCreateSession(t *testing.T) {
 		rr := httptest.NewRecorder()
 		r.Handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	}
+}
+
+func TestEndpointSetValue(t *testing.T) {
+	url := "/api/v1/pie-store/sessions/%s/items/i"
+	s, _ := session.NewSession("client", time.Second*30)
+	sid := s.GetInfo().Id
+	store := session.NewSessionStore()
+	store.Add(s)
+	r := NewRouter(store)
+
+	// test happy path
+	body := bytes.NewReader([]byte("value"))
+	req, _ := http.NewRequest("PUT", fmt.Sprintf(url, sid), body)
+	rr := httptest.NewRecorder()
+	r.Handler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Contains(t, string(rr.Body.Bytes()), `"Size":5`)
+
+	// test invalid inputs
+	data := []struct {
+		sid    string
+		value  []byte
+		status int
+	}{
+		{
+			sid:    s.GetInfo().Id,
+			value:  []byte{},
+			status: http.StatusBadRequest,
+		},
+		{
+			sid:    "not-found",
+			value:  []byte("value"),
+			status: http.StatusNotFound,
+		},
+	}
+	for _, item := range data {
+
+		body := bytes.NewReader(item.value)
+		req, _ := http.NewRequest("PUT", fmt.Sprintf(url, item.sid), body)
+		rr := httptest.NewRecorder()
+		r.Handler.ServeHTTP(rr, req)
+		assert.Equal(t, item.status, rr.Code)
 	}
 }
 
