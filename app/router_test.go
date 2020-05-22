@@ -117,6 +117,44 @@ func TestEndpointSetValue(t *testing.T) {
 	}
 }
 
+func TestEndpointGetValue(t *testing.T) {
+	url := "/api/v1/pie-store/sessions/%s/items/%s"
+	s, _ := session.NewSession("client", time.Second*30)
+	s.SetItem("k", []byte("value"))
+	sid := s.GetInfo().Id
+	store := session.NewSessionStore()
+	store.Add(s)
+	r := NewRouter(store)
+
+	// test happy path
+	req, _ := http.NewRequest("GET", fmt.Sprintf(url, sid, "k"), nil)
+	rr := httptest.NewRecorder()
+	r.Handler.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, "value", string(rr.Body.Bytes()))
+
+	// test invalid inputs
+	data := []struct {
+		sid string
+		key string
+	}{
+		{
+			sid: "invalid",
+			key: "k",
+		},
+		{
+			sid: s.GetInfo().Id,
+			key: "invalid",
+		},
+	}
+	for _, i := range data {
+		req, _ := http.NewRequest("GET", fmt.Sprintf(url, i.sid, i.key), nil)
+		rr := httptest.NewRecorder()
+		r.Handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	}
+}
+
 func toBody(client string, timeout time.Duration) io.Reader {
 	spec := models.SessionSpec{
 		Client:  client,

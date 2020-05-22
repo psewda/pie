@@ -33,6 +33,7 @@ func NewRouter(store session.SessionStore) *DefaultRouter {
 	r.HandleFunc("/version", dr.version).Methods("GET")
 	r.HandleFunc("/sessions", dr.create).Methods("POST")
 	r.HandleFunc("/sessions/{sid}/items/{key}", dr.setItem).Methods("PUT")
+	r.HandleFunc("/sessions/{sid}/items/{key}", dr.getItem).Methods("GET")
 	return dr
 }
 
@@ -86,6 +87,30 @@ func (router *DefaultRouter) setItem(w http.ResponseWriter, r *http.Request) {
 	}
 	s.SetItem(key, v)
 	writeOk(w, struct{ Size int }{Size: len(v)})
+}
+
+func (router *DefaultRouter) getItem(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	sid := params["sid"]
+	key := params["key"]
+
+	s, ok := router.store.Get(sid)
+	if !ok {
+		msg := "The session '%s' not found in the store. It is either not created or expired."
+		writeNotFound(w, fmt.Sprintf(msg, sid))
+		return
+	}
+
+	value, ok := s.GetItem(key)
+	if !ok {
+		msg := "The key '%s' not found in the session. It is either not set or wrong key passed."
+		writeNotFound(w, fmt.Sprintf(msg, key))
+		return
+	}
+
+	w.Header().Add(ContentType, "application/octet-stream")
+	w.WriteHeader(http.StatusOK)
+	w.Write(value)
 }
 
 func writeBadRequest(w http.ResponseWriter, value string) {
