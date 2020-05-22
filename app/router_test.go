@@ -14,25 +14,13 @@ import (
 	"github.com/psewda/pie/app/models"
 	"github.com/psewda/pie/session"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-type mockSessionStore struct {
-	mock.Mock
-}
-
-func (m *mockSessionStore) Add(s session.Session) error {
-	args := m.Called(s)
-	return args.Error(0)
-}
 
 func TestEndpointVersion(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/pie-store/version", nil)
-
-	dr := DefaultRouter{}
+	r := NewRouter(nil)
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(dr.version)
-	handler.ServeHTTP(rr, req)
+	r.Handler.ServeHTTP(rr, req)
 
 	v := func() models.Version {
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -54,7 +42,7 @@ func TestEndpointCreateSession(t *testing.T) {
 	r := NewRouter(store)
 
 	// test happy path
-	body := toBody("client", time.Second*2)
+	body := toSpec("client", time.Second*2)
 	req, _ := http.NewRequest("POST", url, body)
 	rr := httptest.NewRecorder()
 	r.Handler.ServeHTTP(rr, req)
@@ -66,8 +54,8 @@ func TestEndpointCreateSession(t *testing.T) {
 
 	// test invalid inputs
 	data := []string{"invalid", `{"client":"abc"}`}
-	for _, item := range data {
-		req, _ := http.NewRequest("POST", url, strings.NewReader(item))
+	for _, i := range data {
+		req, _ := http.NewRequest("POST", url, strings.NewReader(i))
 		rr := httptest.NewRecorder()
 		r.Handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -107,13 +95,12 @@ func TestEndpointSetValue(t *testing.T) {
 			status: http.StatusNotFound,
 		},
 	}
-	for _, item := range data {
-
-		body := bytes.NewReader(item.value)
-		req, _ := http.NewRequest("PUT", fmt.Sprintf(url, item.sid), body)
+	for _, i := range data {
+		body := bytes.NewReader(i.value)
+		req, _ := http.NewRequest("PUT", fmt.Sprintf(url, i.sid), body)
 		rr := httptest.NewRecorder()
 		r.Handler.ServeHTTP(rr, req)
-		assert.Equal(t, item.status, rr.Code)
+		assert.Equal(t, i.status, rr.Code)
 	}
 }
 
@@ -155,7 +142,7 @@ func TestEndpointGetValue(t *testing.T) {
 	}
 }
 
-func toBody(client string, timeout time.Duration) io.Reader {
+func toSpec(client string, timeout time.Duration) io.Reader {
 	spec := models.SessionSpec{
 		Client:  client,
 		Timeout: timeout,

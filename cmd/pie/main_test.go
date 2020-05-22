@@ -13,7 +13,6 @@ import (
 )
 
 func TestMain(t *testing.T) {
-	t.Parallel()
 	port := app.GetRandPort()
 	os.Setenv("PIE_PORT", strconv.Itoa(int(port)))
 
@@ -40,8 +39,8 @@ func TestParsePort(t *testing.T) {
 
 	// test invalid inputs
 	data := []string{"", "invalid", "1"}
-	for _, item := range data {
-		if port, ok := parsePort(item); true {
+	for _, i := range data {
+		if port, ok := parsePort(i); true {
 			assert.False(t, ok)
 			assert.Equal(t, uint16(0), port)
 		}

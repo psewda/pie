@@ -35,8 +35,8 @@ func TestGetSessionFromStore(t *testing.T) {
 
 	// test invalid inputs
 	data := []string{strutil.Empty, "non-found"}
-	for _, item := range data {
-		s, ok := store.Get(item)
+	for _, i := range data {
+		s, ok := store.Get(i)
 		assert.False(t, ok)
 		assert.Zero(t, s)
 	}
@@ -66,9 +66,9 @@ func TestRemoveSessionFromStore(t *testing.T) {
 		},
 	}
 
-	for _, item := range data {
-		ok := store.Remove(item.id)
-		assert.Equal(t, item.expected, ok)
+	for _, i := range data {
+		ok := store.Remove(i.id)
+		assert.Equal(t, i.expected, ok)
 	}
 }
 

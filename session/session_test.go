@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const client string = "client"
+
 func TestNewSession(t *testing.T) {
 	// test happy path
 	s, err := NewSession(client, time.Second)
@@ -33,8 +35,8 @@ func TestNewSession(t *testing.T) {
 			timout: time.Microsecond * 10,
 		},
 	}
-	for _, item := range data {
-		s, err := NewSession(item.client, item.timout)
+	for _, i := range data {
+		s, err := NewSession(i.client, i.timout)
 		assert.Error(t, err)
 		assert.Zero(t, s)
 	}
@@ -62,8 +64,8 @@ func TestGetItemFromSession(t *testing.T) {
 
 	// test invalid inputs
 	data := []string{strutil.Empty, "not-found"}
-	for _, item := range data {
-		v, ok := s.GetItem(item)
+	for _, i := range data {
+		v, ok := s.GetItem(i)
 		assert.False(t, ok)
 		assert.Nil(t, v)
 	}
